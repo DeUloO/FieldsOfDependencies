@@ -105,7 +105,7 @@ void RegisterDependency(std::vector<Manifest> manifests) {
 void SaveDependencyMap(const std::string& filename)
 {
 	json j = dependencyMap;
-
+	
 	std::ofstream out(filename);
 	if (!out)
 		return;
@@ -134,7 +134,13 @@ std::vector<Manifest> ParseManifests(String modsDirectory) {
 void BuildRequirementsJson() {
 	String gameFolder = fs::current_path().string();
 	String modsFolder = gameFolder + "\\mods\\";
+	String modDataFolder = gameFolder + "mod_data";
 	std::vector<Manifest> manifests = ParseManifests(modsFolder);
 	RegisterDependency(manifests);
+	if (!std::filesystem::exists(modDataFolder))
+	{
+		g_ModuleInterface->Print(CM_LIGHTYELLOW, "[%s %s] - The \"mod_data\" directory was not found. Creating directory: %s", MOD_NAME, VERSION, modDataFolder.c_str());
+		std::filesystem::create_directory(modDataFolder);
+	}
 	SaveDependencyMap("mod_data\\requirements.json");
 }
